@@ -10,7 +10,7 @@ import ArrowForward from 'material-ui-icons/ArrowForward';
 import Person from 'material-ui-icons/Person';
 
 import { Link } from 'react-router-dom';
-import { list } from './../../utils/api-user';
+import { list } from '../../../utils/api-user';
 
 const styles = theme => ({
   root: theme.mixins.gutters({
