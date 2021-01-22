@@ -21,6 +21,7 @@ class Home extends Component {
             Welcome to the MERN Skeleton home page.
             <Link to="/users">Users</Link>
             <Link to="/signup">Sign up</Link>
+            <Link to="/signin">Sign in</Link>
           </Typography>
         </CardContent>
       </Card>
