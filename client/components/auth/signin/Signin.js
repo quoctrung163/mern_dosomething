@@ -6,7 +6,6 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Icon from '@material-ui/core/Icon';
-import PropTypes from 'prop-types';
 import auth from '../../../utils/auth-helper';
 import { Redirect } from 'react-router-dom';
 import { signin } from '../../../utils/api-auth';
