@@ -1,12 +1,16 @@
 import React from 'react';
 import MainRouter from './components/routing/MainRouter';
 import { BrowserRouter } from 'react-router-dom';
-import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
-import { indigo, pink } from 'material-ui/colors';
+import JssProvider from 'react-jss/lib/JssProvider';
+import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
+import { indigo, pink } from '@material-ui/core/colors';
 import { hot } from 'react-hot-loader';
 
 // Create a theme instance.
 const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+  },
   palette: {
     primary: {
       light: '#757de8',
@@ -26,12 +30,15 @@ const theme = createMuiTheme({
   }
 });
 
+const generateClassName = createGenerateClassName();
 const App = () => (
   <BrowserRouter>
-    <MuiThemeProvider theme={theme}>
-      <MainRouter />
-    </MuiThemeProvider>
+    <JssProvider generateClassName={generateClassName}>
+      <MuiThemeProvider theme={theme}>
+        <MainRouter />
+      </MuiThemeProvider>
+    </JssProvider>
   </BrowserRouter>
 );
 
-export default hot(module)(App)
+export default hot(module)(App);

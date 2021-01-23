@@ -1,4 +1,3 @@
-import { darkBaseTheme } from 'material-ui/styles';
 import { signout } from './api-auth';
 
 const auth = {

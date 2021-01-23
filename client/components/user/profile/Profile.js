@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import Paper from 'material-ui/Paper';
-import List, { ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText } from 'material-ui/List';
-import Avatar from 'material-ui/Avatar';
-import IconButton from 'material-ui/IconButton';
-import Button from 'material-ui/Button';
-import Typography from 'material-ui/Typography';
-import Edit from 'material-ui-icons/Edit';
-import Person from 'material-ui-icons/Person';
-import Divider from 'material-ui/Divider';
+import withStyles from '@material-ui/core/styles/withStyles';
+import Paper from '@material-ui/core/Paper';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText from '@material-ui/core/ListItemText';
+import Avatar from '@material-ui/core/Avatar';
+import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Edit from '@material-ui/icons/Edit';
+import Person from '@material-ui/icons/Person';
+import Divider from '@material-ui/core/Divider';
 import DeleteUser from './../delete-user/DeleteUser';
 import auth from '../../../utils/auth-helper';
 import { read } from '../../../utils/api-user';
@@ -61,7 +65,7 @@ class Profile extends Component {
 
     return (
       <Paper className={classes.root} elevation={4}>
-        <Typography type="title" className={classes.title}>
+        <Typography variant="h6" className={classes.title}>
           Profile
         </Typography>
         <List dense>
