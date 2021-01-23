@@ -8,9 +8,18 @@ export const homeStyles = makeStyles(theme => ({
   },
   title: {
     padding: `${theme.spacing(3)}px ${theme.spacing(2.5)}px ${theme.spacing(2)}px`,
-    color: theme.palette.text.secondary
+    color: theme.palette.openTitle
   },
   media: {
-    minHeight: 330
+    minHeight: 400
+  },
+  credit: {
+    padding: 10,
+    textAlign: 'right',
+    backgroundColor: '#ededed',
+    borderBottom: '1px solid #d0d0d0',
+    '& a': {
+      color: '#3f4771'
+    }
   }
 }));
