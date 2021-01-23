@@ -13,6 +13,7 @@ export default ({ markup, css }) => {
           <style>
             a {
               text-decoration: none;
+              color: #061d95;
             }
           </style>
         </head>

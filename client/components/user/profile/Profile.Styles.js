@@ -8,7 +8,7 @@ export const profileStyles = makeStyles(theme => ({
     marginTop: theme.spacing(5)
   }),
   title: {
-    margin: `${theme.spacing(3)}px 0 ${theme.spacing(2)}px`,
+    marginTop: theme.spacing(3),
     color: theme.palette.protectedTitle
   }
 }));

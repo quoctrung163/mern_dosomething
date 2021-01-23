@@ -17,8 +17,8 @@ const isActive = (history, path) => {
 const Menu = withRouter(({ history }) => (
   <AppBar position="static">
     <Toolbar>
-      <Typography variant="subtitle2" color="inherit">
-        MERN Skeleton
+      <Typography variant="h6" color="inherit">
+        Snack Hub
       </Typography>
       <Link to="/">
         <IconButton aria-label="Home" style={isActive(history, "/")}>
@@ -46,7 +46,7 @@ const Menu = withRouter(({ history }) => (
             <Button style={isActive(history, "/user/" + auth.isAuthenticated().user._id)}>My Profile</Button>
           </Link>
           <Button color="inherit" onClick={() => {
-            auth.signout(() => history.push('/'))
+            auth.clearJWT(() => history.push('/'))
           }}>Sign out</Button>
         </span>)
       }
