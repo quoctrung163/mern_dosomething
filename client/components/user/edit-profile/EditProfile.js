@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -6,106 +6,99 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Icon from '@material-ui/core/Icon';
-import PropTypes from 'prop-types';
-import withStyles from '@material-ui/core/styles/withStyles';
-import auth from './../../../utils/auth-helper';
-import { read, update } from './../../../utils/api-user';
+import auth from '../../../utils/auth-helper';
+import { read, update } from '../../../utils/api-user';
 import { Redirect } from 'react-router-dom';
 
 import { editProfileStyles } from './EditProfile.Styles';
 
-class EditProfile extends Component {
-  constructor({ match }) {
-    super()
-    this.state = {
-      name: '',
-      email: '',
-      password: '',
-      redirectToProfile: false,
-      error: ''
-    }
-    this.match = match
-  }
+const EditProfile = ({ match }) => {
+  const classes = editProfileStyles();
+  const [values, setValues] = useState({
+    name: '',
+    password: '',
+    email: '',
+    open: false,
+    error: '',
+    redirectToProfile: false
+  });
+  const jwt = auth.isAuthenticated();
 
-  componentDidMount = () => {
-    const jwt = auth.isAuthenticated();
+  useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
     read({
-      userId: this.match.params.userId
-    }, { t: jwt.token }).then(data => {
-      if (data.error) {
-        this.setState({ error: data.error })
+      userId: match.params.userId
+    }, { t: jwt.token }, signal).then(data => {
+      if (data && data.error) {
+        setValues({
+          ...values, error: data.error
+        })
       } else {
-        this.setState({ name: data.name, email: data.email })
+        setValues({
+          ...values, name: data.name, email: data.email
+        })
       }
-    })
-  }
+    });
 
-  clickSubmit = () => {
-    const jwt = auth.isAuthenticated();
+    return function cleanup() {
+      abortController.abort();
+    }
+  }, [match.params.userId])
+
+  const clickSubmit = () => {
     const user = {
-      name: this.state.name || undefined,
-      email: this.state.email || undefined,
-      password: this.state.password || undefined
+      name: values.name || undefined,
+      email: values.email || undefined,
+      password: values.password || undefined
     }
 
     update({
-      userId: this.match.params.userId
+      userId: match.params.userId
     }, {
       t: jwt.token
     }, user).then(data => {
-      if (data.error) {
-        this.setState({ error: data.error })
+      if (data && data.error) {
+        setValues({ ...values, error: data.error })
       } else {
-        this.setState({ 'userId': data._id, 'redirectToProfile': true })
+        setValues({ ...values, userId: data._id, redirectToProfile: true })
       }
-    });
-  }
-
-  handleChange = name => event => {
-    this.setState({
-      [name]: event.target.value
     })
   }
 
-  render() {
-    const { classes } = this.props;
-    if (this.state.redirectToProfile) {
-      return (
-        <Redirect to={`/user/${this.state.userId}`} />
-      )
-    }
+  const handleChange = name => event => {
+    setValues({ ...values, [name]: event.target.value })
+  }
 
+  if (values.redirectToProfile) {
     return (
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography variant="h6" className={classes.title}>
-            Edit Profile
-          </Typography>
-          <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal" /><br />
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal" /><br />
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal" />
-          <br />
-          {
-            this.state.error && (
-              <Typography component="p" color="error">
-                <Icon color="error" className={classes.error}>Error</Icon>
-                {this.state.error}
-              </Typography>
-            )
-          }
-        </CardContent>
-        <CardActions>
-          <Button color="primary" variant="contained" onClick={this.clickSubmit} className={classes.submit}>
-            Submit
-          </Button>
-        </CardActions>
-      </Card>
+      <Redirect to={`/user/${values.userId}`}
+      />
     )
   }
+
+  return (
+    <Card className={classes.card}>
+      <CardContent>
+        <Typography variant="h6" className={classes.title}>
+          Edit Profile
+          </Typography>
+        <TextField id="name" label="Name" className={classes.textField} value={values.name} onChange={handleChange('name')} margin="normal" /><br />
+        <TextField id="email" type="email" label="Email" className={classes.textField} value={values.email} onChange={handleChange('email')} margin="normal" /><br />
+        <TextField id="password" type="password" label="Password" className={classes.textField} value={values.password} onChange={handleChange('password')} margin="normal" />
+        <br /> {
+          values.error && (<Typography component="p" color="error">
+            <Icon color="error" className={classes.error}>error</Icon>
+            {values.error}
+          </Typography>)
+        }
+      </CardContent>
+      <CardActions>
+        <Button color="primary" variant="contained" onClick={clickSubmit} className={classes.submit}>Submit</Button>
+      </CardActions>
+    </Card>
+  )
 }
 
-EditProfile.propTypes = {
-  classes: PropTypes.object.isRequired
-};
-
-export default withStyles(editProfileStyles)(EditProfile);
+export default EditProfile;

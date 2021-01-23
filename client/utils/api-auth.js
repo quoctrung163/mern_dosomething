@@ -1,19 +1,25 @@
-export const signin = user => {
-  return fetch('/auth/signin/', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(user)
-  }).then(res => res.json())
-    .catch(err => console.log(err))
+export const signin = async user => {
+  try {
+    let res = await fetch('/auth/signin/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(user)
+    });
+    return await res.json();
+  } catch (err) {
+    console.log(err);
+  }
 }
 
-export const signout = () => {
-  return fetch('/auth/signout/', {
-    method: 'GET'
-  }).then(res => res.json())
-    .catch(err => console.log(err))
+export const signout = async () => {
+  try {
+    let res = await fetch('/auth/signout/', { method: 'GET' });
+    return await res.json();
+  } catch (err) {
+    console.log(err);
+  }
 }

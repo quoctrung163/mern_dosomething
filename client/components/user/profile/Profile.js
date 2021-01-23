@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import withStyles from '@material-ui/core/styles/withStyles';
+import React, { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -14,96 +13,74 @@ import Typography from '@material-ui/core/Typography';
 import Edit from '@material-ui/icons/Edit';
 import Person from '@material-ui/icons/Person';
 import Divider from '@material-ui/core/Divider';
-import DeleteUser from './../delete-user/DeleteUser';
+import DeleteUser from '../delete-user/DeleteUser';
 import auth from '../../../utils/auth-helper';
 import { read } from '../../../utils/api-user';
 import { Redirect, Link } from 'react-router-dom';
 
 import { profileStyles } from './Profile.Styles';
 
-class Profile extends Component {
-  constructor({ match }) {
-    super();
-    this.state = {
-      user: '',
-      redirectToSignin: false
-    }
-    this.match = match;
-  }
+const Profile = ({ match }) => {
+  const classes = profileStyles();
+  const [user, setUser] = useState({});
+  const [redirectToSignin, setRedirectToSignin] = useState(false);
+  const jwt = auth.isAuthenticated();
 
-  init = userId => {
-    const jwt = auth.isAuthenticated();
+  useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
     read({
-      userId: userId
-    }, { t: jwt.token }).then(data => {
-      if (data.error) {
-        this.setState({ redirectToSignin: true })
+      userId: match.params.userId
+    }, { t: jwt.token }, signal).then(data => {
+      if (data && data.error) {
+        setRedirectToSignin(true);
       } else {
-        this.setState({ user: data })
+        setUser(data);
       }
-    })
-  }
+    });
 
-  componentWillReceiveProps = props => {
-    this.init(props.match.params.userId);
-  }
-
-  componentDidMount = () => {
-    this.init(this.match.params.userId);
-  }
-
-  componentDidMount = () => {
-    this.init(this.match.params.userId);
-  }
-
-  render() {
-    const { classes } = this.props;
-    const redirectToSignin = this.state.redirectToSignin;
-    if (redirectToSignin) {
-      return <Redirect to='/signin' />
+    return function cleanup() {
+      abortController.abort();
     }
+  }, [match.params.userId])
 
-    return (
-      <Paper className={classes.root} elevation={4}>
-        <Typography variant="h6" className={classes.title}>
-          Profile
-        </Typography>
-        <List dense>
-          <ListItem>
-            <ListItemAvatar>
-              <Avatar>
-                <Person />
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText primary={this.state.user.name} secondary={this.state.user.email} />
-            {
-              auth.isAuthenticated().user && auth.isAuthenticated().user._id == this.state.user._id &&
-              (
-                <ListItemSecondaryAction>
-                  <Link to={`/user/edit/${this.state.user._id}`}>
-                    <IconButton aria-label="Edit" color="primary">
-                      <Edit />
-                    </IconButton>
-                  </Link>
-                  <DeleteUser userId={this.state.user._id} />
-                </ListItemSecondaryAction>
-              )
-            }
-          </ListItem>
-          <Divider />
-          <ListItem>
-            <ListItemText
-              primary={`Joined: ${(new Date(this.state.user.created)).toDateString()}`}
-            />
-          </ListItem>
-        </List>
-      </Paper>
-    )
+  if (redirectToSignin) {
+    return <Redirect to='/signin' />
   }
+
+  return (
+    <Paper className={classes.root} elevation={4}>
+      <Typography variant="h6" className={classes.title}>
+        Profile
+        </Typography>
+      <List dense>
+        <ListItem>
+          <ListItemAvatar>
+            <Avatar>
+              <Person />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary={user.name} secondary={user.email} /> {
+            auth.isAuthenticated().user && auth.isAuthenticated().user._id == user._id &&
+            (<ListItemSecondaryAction>
+              <Link to={"/user/edit/" + user._id}>
+                <IconButton aria-label="Edit" color="primary">
+                  <Edit />
+                </IconButton>
+              </Link>
+              <DeleteUser userId={user._id} />
+            </ListItemSecondaryAction>)
+          }
+        </ListItem>
+        <Divider />
+        <ListItem>
+          <ListItemText primary={"Joined: " + (
+            new Date(user.created)).toDateString()} />
+        </ListItem>
+      </List>
+    </Paper>
+  )
 }
 
-Profile.propTypes = {
-  classes: PropTypes.object.isRequired
-}
-
-export default withStyles(profileStyles)(Profile);
+export default Profile;

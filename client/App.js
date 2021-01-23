@@ -1,44 +1,25 @@
 import React from 'react';
 import MainRouter from './components/routing/MainRouter';
 import { BrowserRouter } from 'react-router-dom';
-import JssProvider from 'react-jss/lib/JssProvider';
-import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
-import { indigo, pink } from '@material-ui/core/colors';
+import { ThemeProvider } from '@material-ui/styles';
+import theme from './themes';
 import { hot } from 'react-hot-loader';
 
-// Create a theme instance.
-const theme = createMuiTheme({
-  typography: {
-    useNextVariants: true,
-  },
-  palette: {
-    primary: {
-      light: '#757de8',
-      main: '#3f51b5',
-      dark: '#002984',
-      contrastText: '#fff',
-    },
-    secondary: {
-      light: '#ff79b0',
-      main: '#ff4081',
-      dark: '#c60055',
-      contrastText: '#000',
-    },
-    openTitle: indigo['400'],
-    protectedTitle: pink['400'],
-    type: 'light'
-  }
-});
+const App = () => {
+  React.useEffect(() => {
+    const jssStyles = document.querySelector('#jss-server-side');
+    if (jssStyles) {
+      jssStyles.parentNode.removeChild(jssStyles);
+    }
+  }, []);
 
-const generateClassName = createGenerateClassName();
-const App = () => (
-  <BrowserRouter>
-    <JssProvider generateClassName={generateClassName}>
-      <MuiThemeProvider theme={theme}>
+  return (
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
         <MainRouter />
-      </MuiThemeProvider>
-    </JssProvider>
-  </BrowserRouter>
-);
+      </ThemeProvider>
+    </BrowserRouter>
+  )
+}
 
 export default hot(module)(App);

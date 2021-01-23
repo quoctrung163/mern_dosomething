@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -7,103 +7,73 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Icon from '@material-ui/core/Icon';
 import PropTypes from 'prop-types';
-import withStyles from '@material-ui/core/styles/withStyles';
-import auth from './../../../utils/auth-helper';
+import auth from '../../../utils/auth-helper';
 import { Redirect } from 'react-router-dom';
 import { signin } from '../../../utils/api-auth';
 
 import { signInStyles } from './Signin.Styles';
 
-class Signin extends Component {
-  state = {
+const Signin = props => {
+  const classes = signInStyles();
+  const [values, setValues] = useState({
     email: '',
     password: '',
     error: '',
     redirectToReferrer: false
-  }
+  });
 
-  clickSubmit = () => {
+  const clickSubmit = () => {
     const user = {
-      email: this.state.email || undefined,
-      password: this.state.password || undefined
+      email: values.email || undefined,
+      password: values.password || undefined
     }
 
     signin(user).then(data => {
       if (data.error) {
-        this.setState({
-          error: data.error
-        })
+        setValues({ ...values, error: data.error })
       } else {
         auth.authenticate(data, () => {
-          this.setState({
-            redirectToReferrer: true
-          })
+          setValues({ ...values, error: '', redirectToReferrer: true })
         })
       }
     })
   }
 
-  handleChange = name => event => {
-    this.setState({
-      [name]: event.target.value
-    })
+  const handleChange = name => event => {
+    setValues({ ...values, [name]: event.target.value })
   }
 
-  render() {
-    const { classes } = this.props;
-    const { from } = this.props.location.state || {
-      from: {
-        pathname: '/'
-      }
+  const { from } = props.location.state || {
+    from: {
+      pathname: '/'
     }
+  }
 
-    const { redirectToReferrer } = this.state;
-    if (redirectToReferrer) {
-      return (
-        <Redirect to={from} />
-      )
-    }
+  const { redirectToReferrer } = values;
+  if (redirectToReferrer) {
+    return <Redirect to={from} />
+  }
 
-    return (
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography variant="h5" className={classes.title}>
-            Sign In
+  return (
+    <Card className={classes.card}>
+      <CardContent>
+        <Typography variant="h5" className={classes.title}>
+          Sign In
           </Typography>
-          <TextField
-            id="email" type="email" label="Email"
-            className={classes.textField} value={this.state.email}
-            onChange={this.handleChange('email')}
-            margin="email"
-          /> <br />
-          <TextField
-            id="password" type="password" label="Password"
-            className={classes.textField}
-            value={this.state.password}
-            onChange={this.handleChange('password')}
-            margin="normal"
-          /> <br />
-          {
-            this.state.error && (
-              <Typography component="p" color="error">
-                <Icon color="error" className={classes.error}>
-                  error
-                </Icon>
-                {this.state.error}
-              </Typography>
-            )
-          }
-        </CardContent>
-        <CardActions>
-          <Button color="primary" variant="contained" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>
-        </CardActions>
-      </Card>
-    )
-  }
+        <TextField id="email" type="email" label="Email" className={classes.textField} value={values.email} onChange={handleChange('email')} margin="normal" /><br />
+        <TextField id="password" type="password" label="Password" className={classes.textField} value={values.password} onChange={handleChange('password')} margin="normal" />
+        <br /> {
+          values.error && (<Typography component="p" color="error">
+            <Icon color="error" className={classes.error}>error</Icon>
+            {values.error}
+          </Typography>)
+        }
+      </CardContent>
+      <CardActions>
+        <Button color="primary" variant="contained" onClick={clickSubmit} className={classes.submit}>Submit</Button>
+      </CardActions>
+    </Card>
+  )
 }
 
-Signin.propTypes = {
-  classes: PropTypes.object.isRequired
-}
-
-export default withStyles(signInStyles)(Signin);
+export default Signin;

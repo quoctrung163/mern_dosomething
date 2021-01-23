@@ -1,6 +1,4 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import withStyles from '@material-ui/core/styles/withStyles';
+import React, { useState, useEffect } from 'react';
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -16,43 +14,39 @@ import Person from '@material-ui/icons/Person';
 import { Link } from 'react-router-dom';
 import { list } from '../../../utils/api-user';
 
-const styles = theme => ({
-  root: theme.mixins.gutters({
-    padding: theme.spacing.unit,
-    margin: theme.spacing.unit * 5
-  }),
-  title: {
-    margin: `${theme.spacing.unit * 4}px 0 ${theme.spacing.unit * 2}px`,
-    color: theme.palette.openTitle
-  }
-});
+import { usersStyles } from './Users.Styles';
 
-class Users extends Component {
-  state = {
-    users: []
-  }
+const Users = () => {
+  const classes = usersStyles();
+  const [users, setUsers] = useState([]);
 
-  componentDidMount() {
-    list().then(data => {
-      if (data.error) {
+  useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    list(signal).then(data => {
+      if (data && data.error) {
         console.log(data.error);
       } else {
-        this.setState({ users: data })
+        setUsers(data);
       }
-    })
-  }
+    });
 
-  render() {
-    const { classes } = this.props;
-    return (
-      <Paper className={classes.root} elevation={4}>
-        <Typography variant="h6" className={classes.title}>
-          All Users
-        </Typography>
-        <List dense>
-          {
-            this.state.users.map((item, i) => {
-              return <Link to={"/user/" + item._id} key={i}>
+    return function cleanup() {
+      abortController.abort();
+    }
+  }, []);
+
+  return (
+    <Paper className={classes.root} elevation={4}>
+      <Typography variant="h6" className={classes.title}>
+        All Users
+      </Typography>
+      <List dense>
+        {
+          users.map((item, i) => {
+            return (
+              <Link to={`/user/${item._id}`} key={i}>
                 <ListItem button>
                   <ListItemAvatar>
                     <Avatar>
@@ -67,16 +61,12 @@ class Users extends Component {
                   </ListItemSecondaryAction>
                 </ListItem>
               </Link>
-            })
-          }
-        </List>
-      </Paper>
-    )
-  }
+            )
+          })
+        }
+      </List>
+    </Paper>
+  )
 }
 
-Users.propTypes = {
-  classes: PropTypes.object.isRequired
-}
-
-export default withStyles(styles)(Users);
+export default Users;
