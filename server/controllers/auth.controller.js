@@ -1,7 +1,8 @@
-import User from '../models/user.model'
-import jwt from 'jsonwebtoken'
-import expressJwt from 'express-jwt'
-import config from './../../config/config'
+import User from '../models/user.model';
+import jwt from 'jsonwebtoken';
+import expressJwt from 'express-jwt';
+import config from './../../config/config';
+import jwks from 'jwks-rsa';
 
 const signin = async (req, res) => {
   try {
@@ -32,7 +33,8 @@ const signin = async (req, res) => {
       user: {
         _id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        educator: user.educator
       }
     })
 
@@ -51,7 +53,7 @@ const signout = (req, res) => {
 }
 
 const requireSignin = expressJwt({
-  secret: config.jwtSecret,
+  secret: 'quoctrung163',
   userProperty: 'auth'
 })
 

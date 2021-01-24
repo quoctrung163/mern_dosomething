@@ -1,6 +1,6 @@
-import User from '../models/user.model'
-import _ from 'lodash'
-import errorHandler from './../helpers/dbErrorHandler'
+import User from '../models/user.model';
+import extend from 'lodash/extend';
+import errorHandler from './../helpers/dbErrorHandler';
 
 const create = async (req, res) => {
   const user = new User(req.body)
@@ -55,7 +55,7 @@ const list = async (req, res) => {
 const update = async (req, res) => {
   try {
     let user = req.profile;
-    user = _.extend(user, req.body);
+    user = extend(user, req.body);
     user.updated = Date.now();
     await user.save();
     user.hashed_password = undefined;
@@ -82,11 +82,22 @@ const remove = async (req, res) => {
   }
 }
 
+const isEducator = (req, res, next) => {
+  const isEducator = req.profile && req.profile.educator;
+  if (!isEducator) {
+    return res.status(403).json({
+      error: 'User is not an educator'
+    })
+  }
+  next();
+}
+
 export default {
   create,
   userByID,
   read,
   list,
   remove,
-  update
+  update,
+  isEducator
 }

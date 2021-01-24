@@ -1,13 +1,15 @@
-import express from 'express'
-import path from 'path'
-import bodyParser from 'body-parser'
-import cookieParser from 'cookie-parser'
-import compress from 'compression'
-import cors from 'cors'
-import helmet from 'helmet'
-import Template from './../template'
-import userRoutes from './routes/user.routes'
-import authRoutes from './routes/auth.routes'
+import express from 'express';
+import path from 'path';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import compress from 'compression';
+import cors from 'cors';
+import helmet from 'helmet';
+import Template from './../template';
+import userRoutes from './routes/user.routes';
+import authRoutes from './routes/auth.routes';
+import courseRoutes from './routes/course.routes';
+import enrollmentRoutes from './routes/enrollment.routes';
 
 // modules for server-side-rendering
 import React from 'react';
@@ -41,8 +43,10 @@ app.use(cors())
 app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')));
 
 // mount routes
-app.use('/', userRoutes)
-app.use('/', authRoutes)
+app.use('/', userRoutes);
+app.use('/', authRoutes);
+app.use('/', courseRoutes);
+app.use('/', enrollmentRoutes);
 
 app.get('*', (req, res) => {
   const sheets = new ServerStyleSheets();

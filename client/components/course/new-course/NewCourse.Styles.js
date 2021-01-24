@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 
-export const editProfileStyles = makeStyles(theme => ({
+export const newCourseStyles = makeStyles(theme => ({
   card: {
     maxWidth: 600,
     margin: 'auto',
@@ -8,12 +8,12 @@ export const editProfileStyles = makeStyles(theme => ({
     marginTop: theme.spacing(12),
     paddingBottom: theme.spacing(2)
   },
-  title: {
-    margin: theme.spacing(2),
-    color: theme.palette.protectedTitle
-  },
   error: {
     verticalAlign: 'middle'
+  },
+  title: {
+    marginTop: theme.spacing(2),
+    color: theme.palette.openTitle
   },
   textField: {
     marginLeft: theme.spacing(1),
@@ -23,5 +23,11 @@ export const editProfileStyles = makeStyles(theme => ({
   submit: {
     margin: 'auto',
     marginBottom: theme.spacing(2)
+  },
+  input: {
+    display: 'none'
+  },
+  filename: {
+    marginLeft: '10px'
   }
 }));

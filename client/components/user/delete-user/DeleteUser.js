@@ -28,7 +28,7 @@ const DeleteUser = props => {
       if (data && data.error) {
         console.log(data.error);
       } else {
-        auth.signout(() => console.log('deleted'));
+        auth.clearJWT(() => console.log('deleted'));
         setRedirect(true);
       }
     })
