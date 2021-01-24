@@ -4,7 +4,7 @@ import GridListTile from '@material-ui/core/GridListTile'
 import GridListTileBar from '@material-ui/core/GridListTileBar'
 import CompletedIcon from '@material-ui/icons/VerifiedUser'
 import InProgressIcon from '@material-ui/icons/DonutLarge'
-
+import { Link } from 'react-router-dom'
 import { enrollmentsStyles } from './Enrollments.Styles';
 
 const Enrollments = props => {

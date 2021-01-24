@@ -25,72 +25,58 @@ import { CardContent } from '@material-ui/core';
 
 import { enrollmentStyles } from './Enrollment.Styles';
 
-const Enrollment = ({ match }) => {
-  const classes = enrollmentStyles();
-  const [enrollment, setEnrollment] = useState({
-    course: { instructor: [] },
-    lessonStatus: []
-  });
+export default function Enrollment({ match }) {
+  const classes = enrollmentStyles()
+  const [enrollment, setEnrollment] = useState({ course: { instructor: [] }, lessonStatus: [] })
   const [values, setValues] = useState({
     error: '',
     drawer: -1
-  });
-  const [totalComplete, setTotalComplete] = useState(0);
-  const jwt = auth.isAuthenticated();
-
+  })
+  const [totalComplete, setTotalComplete] = useState(0)
+  const jwt = auth.isAuthenticated()
   useEffect(() => {
-    const abortController = new AbortController();
-    const signal = abortController.signal;
+    const abortController = new AbortController()
+    const signal = abortController.signal
 
-    read({ enrollmentId: match.params.enrollmentId }, {
-      t: jwt.token
-    }, signal).then(data => {
+    read({ enrollmentId: match.params.enrollmentId }, { t: jwt.token }, signal).then((data) => {
       if (data.error) {
         setValues({ ...values, error: data.error })
       } else {
-        totalComplete(data.lessonStatus);
-        setEnrollment(data);
+        totalCompleted(data.lessonStatus)
+        setEnrollment(data)
       }
-    });
-
+    })
     return function cleanup() {
-      abortController.abort();
+      abortController.abort()
     }
-  }, [match.params.enrollmentId]);
-
-  const totalCompleted = lessons => {
-    console.log(lessons);
-    let count = lessons.reduce((total, lessonStatus) => {
-      return total + (lessonStatus.complete ? 1 : 0)
-    }, 0);
-    setTotalComplete(count);
-    console.log(count);
-    return count;
+  }, [match.params.enrollmentId])
+  const totalCompleted = (lessons) => {
+    let count = lessons.reduce((total, lessonStatus) => { return total + (lessonStatus.complete ? 1 : 0) }, 0)
+    setTotalComplete(count)
+    return count
   }
-
-  const selectDrawer = index => event => {
+  const selectDrawer = (index) => event => {
     setValues({ ...values, drawer: index })
   }
-
   const markComplete = () => {
     if (!enrollment.lessonStatus[values.drawer].complete) {
-      const lessonStatus = enrollment.lessonStatus;
-      lessonStatus[values.drawer].complete = true;
-      let count = totalCompleted(lessonStatus);
+      const lessonStatus = enrollment.lessonStatus
+      lessonStatus[values.drawer].complete = true
+      let count = totalCompleted(lessonStatus)
 
-      let updatedData = {};
-      updatedData.lessonStatusId = lessonStatus[values.drawer]._id;
-      updatedData.complete = true;
+      let updatedData = {}
+      updatedData.lessonStatusId = lessonStatus[values.drawer]._id
+      updatedData.complete = true
 
-      if (Number(count) === Number(lessonStatus.length)) {
-        updatedData.courseCompleted = Date.now();
+      if (count == lessonStatus.length) {
+        updatedData.courseCompleted = Date.now()
       }
 
       complete({
         enrollmentId: match.params.enrollmentId
       }, {
         t: jwt.token
-      }, updatedData).then(data => {
+      }, updatedData).then((data) => {
         if (data && data.error) {
           setValues({ ...values, error: data.error })
         } else {
@@ -99,39 +85,31 @@ const Enrollment = ({ match }) => {
       })
     }
   }
-
-  const imageUrl = enrollment.course._id ?
-    `/api/courses/photo/${enrollment.course._id}?${new Date().getTime()}`
-    : '/api/courses/defaultphoto';
-
+  const imageUrl = enrollment.course._id
+    ? `/api/courses/photo/${enrollment.course._id}?${new Date().getTime()}`
+    : '/api/courses/defaultphoto'
   return (
     <div className={classes.root}>
       <Drawer
         className={classes.drawer}
         variant="permanent"
         classes={{
-          paper: classes.drawerPaper
-        }}>
-        <div className={classes.toolbar} />
+          paper: classes.drawerPaper,
+        }}
+      ><div className={classes.toolbar} />
         <List>
-          <ListItem button onClick={selectDrawer(-1)}
-            className={values.drawer == -1 ? classes.selectedDrawer : classes.unselected}>
-            <ListItemIcon>
-              <Info />
-            </ListItemIcon>
-            <ListItemText
-              primary={"Course Overview"}
-            />
+          <ListItem button onClick={selectDrawer(-1)} className={values.drawer == -1 ? classes.selectedDrawer : classes.unselected}>
+            <ListItemIcon><Info /></ListItemIcon>
+            <ListItemText primary={"Course Overview"} />
           </ListItem>
         </List>
         <Divider />
         <List className={classes.unselected}>
           <ListSubheader component="div" className={classes.subhead}>
             Lessons
-          </ListSubheader>
+        </ListSubheader>
           {enrollment.lessonStatus.map((lesson, index) => (
-            <ListItem button key={index} onClick={selectDrawer(index)}
-              className={values.drawer == index ? classes.selectedDrawer : classes.unselected}>
+            <ListItem button key={index} onClick={selectDrawer(index)} className={values.drawer == index ? classes.selectedDrawer : classes.unselected}>
               <ListItemAvatar>
                 <Avatar className={classes.avatar}>
                   {index + 1}
@@ -139,9 +117,7 @@ const Enrollment = ({ match }) => {
               </ListItemAvatar>
               <ListItemText primary={enrollment.course.lessons[index].title} />
               <ListItemSecondaryAction>
-                {lesson.complete ?
-                  <CheckCircle className={classes.check} /> : <RadioButtonUncheckedIcon />
-                }
+                {lesson.complete ? <CheckCircle className={classes.check} /> : <RadioButtonUncheckedIcon />}
               </ListItemSecondaryAction>
             </ListItem>
           ))}
@@ -149,37 +125,26 @@ const Enrollment = ({ match }) => {
         <Divider />
         <List>
           <ListItem>
-            <ListItemText primary={<div className={classes.progress}>
-              <span>{totalComplete}</span> out of
-              <span>{enrollment.lessonStatus.length}</span> completed
-            </div>}>
-            </ListItemText>
+            <ListItemText primary={<div className={classes.progress}><span>{totalComplete}</span> out of <span>{enrollment.lessonStatus.length}</span> completed</div>} />
           </ListItem>
         </List>
       </Drawer>
-      {values.drawer == -1 &&
+      {values.drawer == - 1 &&
         <Card className={classes.card}>
           <CardHeader
             title={enrollment.course.name}
-            subheader={
-              <div>
-                <Link to={`/user/${enrollment.course._id}`}
-                  className={classes.sub}
-                >
-                  By {enrollment.course.instructor.name}
-                </Link>
-                <span className={classes.category}>
-                  {enrollment.course.category}
-                </span>
-              </div>
+            subheader={<div>
+              <Link to={"/user/" + enrollment.course.instructor._id} className={classes.sub}>By {enrollment.course.instructor.name}</Link>
+              <span className={classes.category}>{enrollment.course.category}</span>
+            </div>
             }
             action={
-              totalComplete == enrollment.lessonStatus.length && (
-                <span className={classes.action}>
-                  <Button variant="contained" color="secondary">
-                    <CheckCircle /> &nbsp; Completed
+              totalComplete == enrollment.lessonStatus.length &&
+              (<span className={classes.action}>
+                <Button variant="contained" color="secondary">
+                  <CheckCircle /> &nbsp; Completed
                   </Button>
-                </span>)
+              </span>)
             }
           />
           <div className={classes.flex}>
@@ -196,57 +161,49 @@ const Enrollment = ({ match }) => {
           </div>
           <Divider />
           <div>
-            <CardHeader title={
-              <Typography variant="h6" className={classes.subheading}>
-                Lessons
-              </Typography>}
-              subheader={
-                <Typography variant="body1" className={classes.subheading}>
-                  {enrollment.course.lessons && enrollment.course.lessons.length} lessons
-              </Typography>}
+            <CardHeader
+              title={<Typography variant="h6" className={classes.subheading}>Lessons</Typography>
+              }
+              subheader={<Typography variant="body1" className={classes.subheading}>{enrollment.course.lessons && enrollment.course.lessons.length} lessons</Typography>}
               action={
                 auth.isAuthenticated().user && auth.isAuthenticated().user._id == enrollment.course.instructor._id &&
-                (<span className={classes.action}></span>)
+                (<span className={classes.action}>
+
+                </span>)
               }
             />
             <List>
               {enrollment.course.lessons && enrollment.course.lessons.map((lesson, i) => {
-                return (
-                  <span key={i}>
-                    <ListItem>
-                      <ListItemAvatar>
-                        <Avatar>
-                          {i + 1}
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={lesson.title}
-                      />
-                    </ListItem>
-                    <Divider variant="inset" component="li" />
-                  </span>
-                )
-              })}
+                return (<span key={i}>
+                  <ListItem>
+                    <ListItemAvatar>
+                      <Avatar>
+                        {i + 1}
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={lesson.title}
+                    />
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                </span>)
+              }
+              )}
             </List>
           </div>
         </Card>}
-      {
-        values.drawer != -1 && (<>
-          <Typography variant="h5" className={classes.heading}>{enrollment.course.name}</Typography>
-          <Card className={classes.card}>
-            <CardHeader
-              title={enrollment.course.lessons[values.drawer].title}
-              action={<Button onClick={markComplete} variant={enrollment.lessonStatus[values.drawer].complete ? 'contained' : 'outlined'} color="secondary">{enrollment.lessonStatus[values.drawer].complete ? "Completed" : "Mark as complete"}</Button>} />
-            <CardContent>
-              <Typography variant="body1" className={classes.para}>{enrollment.course.lessons[values.drawer].content}</Typography>
-            </CardContent>
-            <CardActions>
-              <a href={enrollment.course.lessons[values.drawer].resource_url}><Button variant="contained" color="primary">Resource Link</Button></a>
-            </CardActions>
-          </Card></>)
-      }
-    </div >
-  )
+      {values.drawer != -1 && (<>
+        <Typography variant="h5" className={classes.heading}>{enrollment.course.name}</Typography>
+        <Card className={classes.card}>
+          <CardHeader
+            title={enrollment.course.lessons[values.drawer].title}
+            action={<Button onClick={markComplete} variant={enrollment.lessonStatus[values.drawer].complete ? 'contained' : 'outlined'} color="secondary">{enrollment.lessonStatus[values.drawer].complete ? "Completed" : "Mark as complete"}</Button>} />
+          <CardContent>
+            <Typography variant="body1" className={classes.para}>{enrollment.course.lessons[values.drawer].content}</Typography>
+          </CardContent>
+          <CardActions>
+            <a href={enrollment.course.lessons[values.drawer].resource_url}><Button variant="contained" color="primary">Resource Link</Button></a>
+          </CardActions>
+        </Card></>)}
+    </div>)
 }
-
-export default Enrollment;
